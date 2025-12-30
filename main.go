@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"math/cmplx"
 	"os"
 
 	"github.com/go-audio/wav"
+	"github.com/mjibson/go-dsp/fft"
 )
 
 func main() {
@@ -40,4 +42,16 @@ func main() {
 
 	//now we have sample rate, channels, length of sample, and the samples in float64
 	//do fft next
+
+	const frameSize = 2048
+
+	frame := samples[1024 : frameSize+1024] //grabs the first frame
+	spectrum := fft.FFTReal(frame)
+
+	fmt.Println("\nFrequency spectrum:")
+	for i := 0; i < len(spectrum)/2; i++ {
+		mag := cmplx.Abs(spectrum[i])
+		freq := float64(i) * float64(sampleRate) / float64(frameSize)
+		fmt.Printf("Bin %3d (%7.1f Hz): %.2f\n", i, freq, mag)
+	}
 }
